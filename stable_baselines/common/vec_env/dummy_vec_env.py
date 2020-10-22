@@ -1,10 +1,7 @@
 from collections import OrderedDict
-from typing import Sequence
-from copy import deepcopy
-
 import numpy as np
 
-from stable_baselines.common.vec_env.base_vec_env import VecEnv
+from stable_baselines.common.vec_env import VecEnv
 from stable_baselines.common.vec_env.util import copy_obs_dict, dict_to_obs, obs_space_info
 
 
@@ -15,8 +12,7 @@ class DummyVecEnv(VecEnv):
     multiprocess or multithread outweighs the environment computation time. This can also be used for RL methods that
     require a vectorized environment, but that you want a single environments to train with.
 
-    :param env_fns: ([callable]) A list of functions that will create the environments
-        (each callable returns a `Gym.Env` instance when called).
+    :param env_fns: ([Gym Environment]) the list of environments to vectorize
     """
 
     def __init__(self, env_fns):
@@ -48,13 +44,7 @@ class DummyVecEnv(VecEnv):
                 obs = self.envs[env_idx].reset()
             self._save_obs(env_idx, obs)
         return (self._obs_from_buf(), np.copy(self.buf_rews), np.copy(self.buf_dones),
-                deepcopy(self.buf_infos))
-
-    def seed(self, seed=None):
-        seeds = list()
-        for idx, env in enumerate(self.envs):
-            seeds.append(env.seed(seed + idx))
-        return seeds
+                self.buf_infos.copy())
 
     def reset(self):
         for env_idx in range(self.num_envs):
@@ -66,25 +56,14 @@ class DummyVecEnv(VecEnv):
         for env in self.envs:
             env.close()
 
-    def get_images(self) -> Sequence[np.ndarray]:
+    def get_images(self):
         return [env.render(mode='rgb_array') for env in self.envs]
 
-    def render(self, mode: str = 'human'):
-        """
-        Gym environment rendering. If there are multiple environments then
-        they are tiled together in one image via `BaseVecEnv.render()`.
-        Otherwise (if `self.num_envs == 1`), we pass the render call directly to the
-        underlying environment.
-
-        Therefore, some arguments such as `mode` will have values that are valid
-        only when `num_envs == 1`.
-
-        :param mode: The rendering type.
-        """
+    def render(self, *args, **kwargs):
         if self.num_envs == 1:
-            return self.envs[0].render(mode=mode)
+            return self.envs[0].render(*args, **kwargs)
         else:
-            return super().render(mode=mode)
+            return super().render(*args, **kwargs)
 
     def _save_obs(self, env_idx, obs):
         for key in self.keys:

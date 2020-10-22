@@ -16,14 +16,6 @@ import os
 import sys
 from unittest.mock import MagicMock
 
-# We CANNOT enable 'sphinxcontrib.spelling' because ReadTheDocs.org does not support
-# PyEnchant.
-try:
-    import sphinxcontrib.spelling
-    enable_spell_check = True
-except ImportError:
-    enable_spell_check = False
-
 # source code directory, relative to this file, for sphinx-autobuild
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -36,29 +28,28 @@ class Mock(MagicMock):
 # Mock modules that requires C modules
 # Note: because of that we cannot test examples using CI
 MOCK_MODULES = ['joblib', 'scipy', 'scipy.signal',
-                'mpi4py', 'mujoco-py', 'cv2', 'tensorflow',
+                'pandas', 'mpi4py', 'mujoco-py', 'cv2', 'tensorflow',
                 'tensorflow.contrib', 'tensorflow.contrib.layers',
                 'tensorflow.python', 'tensorflow.python.client', 'tensorflow.python.ops',
-                'tqdm', 'matplotlib', 'matplotlib.pyplot',
-                'seaborn', 'tensorflow.core', 'tensorflow.core.util', 'tensorflow.python.util',
-                'zmq']
+                'tqdm', 'cloudpickle', 'matplotlib', 'matplotlib.pyplot',
+                'seaborn', 'gym', 'gym.spaces', 'gym.core',
+                'tensorflow.core', 'tensorflow.core.util', 'tensorflow.python.util',
+                'gym.wrappers', 'gym.wrappers.monitoring', 'zmq']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
-# Read version from file
-version_file = os.path.join(os.path.dirname(__file__), '../stable_baselines', 'version.txt')
-with open(version_file, 'r') as file_handler:
-    __version__ = file_handler.read().strip()
+import stable_baselines
+
 
 # -- Project information -----------------------------------------------------
 
 project = 'Stable Baselines'
-copyright = '2018-2020, Stable Baselines'
+copyright = '2018-2019, Stable Baselines'
 author = 'Stable Baselines Contributors'
 
 # The short X.Y version
-version = 'master (' + __version__ + ' )'
+version = 'master (' + stable_baselines.__version__ + ' )'
 # The full version, including alpha/beta/rc tags
-release = __version__
+release = stable_baselines.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -77,9 +68,6 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
 ]
-
-if enable_spell_check:
-    extensions.append('sphinxcontrib.spelling')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

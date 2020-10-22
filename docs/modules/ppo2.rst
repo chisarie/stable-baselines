@@ -8,8 +8,8 @@ PPO2
 The `Proximal Policy Optimization <https://arxiv.org/abs/1707.06347>`_ algorithm combines ideas from A2C (having multiple workers)
 and TRPO (it uses a trust region to improve the actor).
 
-The main idea is that after an update, the new policy should be not too far from the old policy.
-For that, PPO uses clipping to avoid too large update.
+The main idea is that after an update, the new policy should be not too far form the old policy.
+For that, ppo uses clipping to avoid too large update.
 
 .. note::
 
@@ -61,11 +61,12 @@ Train a PPO agent on `CartPole-v1` using 4 processes.
    import gym
 
    from stable_baselines.common.policies import MlpPolicy
-   from stable_baselines.common import make_vec_env
+   from stable_baselines.common.vec_env import SubprocVecEnv
    from stable_baselines import PPO2
 
    # multiprocess environment
-   env = make_vec_env('CartPole-v1', n_envs=4)
+   n_cpu = 4
+   env = SubprocVecEnv([lambda: gym.make('CartPole-v1') for i in range(n_cpu)])
 
    model = PPO2(MlpPolicy, env, verbose=1)
    model.learn(total_timesteps=25000)
@@ -88,44 +89,3 @@ Parameters
 .. autoclass:: PPO2
   :members:
   :inherited-members:
-
-Callbacks - Accessible Variables
---------------------------------
-
-Depending on initialization parameters and timestep, different variables are accessible.
-Variables accessible "From timestep X" are variables that can be accessed when
-``self.timestep==X`` in the ``on_step`` function.
-
-    +--------------------------------+-----------------------------------------------------+
-    |Variable                        |                                         Availability|
-    +================================+=====================================================+
-    |- self                          |From timestep 1                                      |
-    |- total_timesteps               |                                                     |
-    |- callback                      |                                                     |
-    |- log_interval                  |                                                     |
-    |- tb_log_name                   |                                                     |
-    |- reset_num_timesteps           |                                                     |
-    |- cliprange_vf                  |                                                     |
-    |- new_tb_log                    |                                                     |
-    |- writer                        |                                                     |
-    |- t_first_start                 |                                                     |
-    |- n_updates                     |                                                     |
-    |- mb_obs                        |                                                     |
-    |- mb_rewards                    |                                                     |
-    |- mb_actions                    |                                                     |
-    |- mb_values                     |                                                     |
-    |- mb_dones                      |                                                     |
-    |- mb_neglogpacs                 |                                                     |
-    |- mb_states                     |                                                     |
-    |- ep_infos                      |                                                     |
-    |- actions                       |                                                     |
-    |- values                        |                                                     |
-    |- neglogpacs                    |                                                     |
-    |- clipped_actions               |                                                     |
-    |- rewards                       |                                                     |
-    |- infos                         |                                                     |
-    +--------------------------------+-----------------------------------------------------+
-    |- info                          |From timestep 1                                      |
-    |- maybe_ep_info                 |                                                     |
-    +--------------------------------+-----------------------------------------------------+
-

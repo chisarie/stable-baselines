@@ -10,7 +10,7 @@ DDPG
 .. note::
 
   DDPG requires :ref:`OpenMPI <openmpi>`. If OpenMPI isn't enabled, then DDPG isn't
-  imported into the ``stable_baselines`` module.
+  imported into the `stable_baselines` module.
 
 .. warning::
 
@@ -63,10 +63,12 @@ Example
   import numpy as np
 
   from stable_baselines.ddpg.policies import MlpPolicy
-  from stable_baselines.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise, AdaptiveParamNoiseSpec
+  from stable_baselines.common.vec_env import DummyVecEnv
+  from stable_baselines.ddpg.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise, AdaptiveParamNoiseSpec
   from stable_baselines import DDPG
 
   env = gym.make('MountainCarContinuous-v0')
+  env = DummyVecEnv([lambda: env])
 
   # the noise objects for DDPG
   n_actions = env.action_space.shape[-1]
@@ -146,6 +148,7 @@ You can easily define a custom architecture for the policy network:
   import gym
 
   from stable_baselines.ddpg.policies import FeedForwardPolicy
+  from stable_baselines.common.vec_env import DummyVecEnv
   from stable_baselines import DDPG
 
   # Custom MLP policy of two layers of size 16 each
@@ -156,72 +159,10 @@ You can easily define a custom architecture for the policy network:
                                              layer_norm=False,
                                              feature_extraction="mlp")
 
+  # Create and wrap the environment
+  env = gym.make('Pendulum-v0')
+  env = DummyVecEnv([lambda: env])
 
-  model = DDPG(CustomDDPGPolicy, 'Pendulum-v0', verbose=1)
+  model = DDPG(CustomDDPGPolicy, env, verbose=1)
   # Train the agent
   model.learn(total_timesteps=100000)
-
-
-Callbacks - Accessible Variables
---------------------------------
-
-
-Depending on initialization parameters and timestep, different variables are accessible.
-Variables accessible from "timestep X" are variables that can be accessed when ``self.timestep==X`` from the ``on_step`` function.
-
-    +--------------------------------+-----------------------------------------------------+
-    |Variable                        |                                         Availability|
-    +================================+=====================================================+
-    |- self                          |From timestep 1                                      |
-    |- total_timesteps               |                                                     |
-    |- callback                      |                                                     |
-    |- log_interval                  |                                                     |
-    |- tb_log_name                   |                                                     |
-    |- reset_num_timesteps           |                                                     |
-    |- replay_wrapper                |                                                     |
-    |- new_tb_log                    |                                                     |
-    |- writer                        |                                                     |
-    |- rank                          |                                                     |
-    |- eval_episode_rewards_history  |                                                     |
-    |- episode_rewards_history       |                                                     |
-    |- episode_successes             |                                                     |
-    |- obs                           |                                                     |
-    |- eval_obs                      |                                                     |
-    |- episode_reward                |                                                     |
-    |- episode_step                  |                                                     |
-    |- episodes                      |                                                     |
-    |- step                          |                                                     |
-    |- total_steps                   |                                                     |
-    |- start_time                    |                                                     |
-    |- epoch_episode_rewards         |                                                     |
-    |- epoch_episode_steps           |                                                     |
-    |- epoch_actor_losses            |                                                     |
-    |- epoch_critic_losses           |                                                     |
-    |- epoch_adaptive_distances      |                                                     |
-    |- eval_episode_rewards          |                                                     |
-    |- eval_qs                       |                                                     |
-    |- epoch_actions                 |                                                     |
-    |- epoch_qs                      |                                                     |
-    |- epoch_episodes                |                                                     |
-    |- epoch                         |                                                     |
-    |- action                        |                                                     |
-    |- q_value                       |                                                     |
-    |- unscaled_action               |                                                     |
-    |- new_obs                       |                                                     |
-    |- reward                        |                                                     |
-    |- done                          |                                                     |
-    |- info                          |                                                     |
-    +--------------------------------+-----------------------------------------------------+
-    |- obs\_                         |From timestep 2                                      |
-    |- new_obs\_                     |                                                     |
-    |- reward\_                      |                                                     |
-    +--------------------------------+-----------------------------------------------------+
-    |- t_train                       |After nb_rollout_steps+1                             |
-    +--------------------------------+-----------------------------------------------------+
-    |- distance                      |After                                                |
-    |                                |nb_rollout_steps*ceil(nb_rollout_steps/batch_size)```|
-    |- critic_loss                   |                                                     |
-    |- actor_loss                    |                                                     |
-    +--------------------------------+-----------------------------------------------------+
-    |- maybe_is_success              |After episode termination                            |
-    +--------------------------------+-----------------------------------------------------+

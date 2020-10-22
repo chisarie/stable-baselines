@@ -2,7 +2,7 @@ import queue
 import time
 from multiprocessing import Queue, Process
 
-import cv2  # pytype:disable=import-error
+import cv2
 import numpy as np
 from joblib import Parallel, delayed
 
@@ -30,8 +30,6 @@ class ExpertDataset(object):
     :param sequential_preprocessing: (bool) Do not use subprocess to preprocess
         the data (slower but use less memory for the CI)
     """
-    # Excluded attribute when pickling the object
-    EXCLUDED_KEYS = {'dataloader', 'train_loader', 'val_loader'}
 
     def __init__(self, expert_path=None, traj_data=None, train_fraction=0.7, batch_size=64,
                  traj_limitation=-1, randomize=True, verbose=1, sequential_preprocessing=False):
@@ -120,35 +118,13 @@ class ExpertDataset(object):
                                      sequential=self.sequential_preprocessing)
 
     def __del__(self):
-        # Exit processes if needed
-        for key in self.EXCLUDED_KEYS:
-            if self.__dict__.get(key) is not None:
-                del self.__dict__[key]
+        del self.dataloader, self.train_loader, self.val_loader
 
-    def __getstate__(self):
+    def prepare_pickling(self):
         """
-        Gets state for pickling.
-
-        Excludes processes that are not pickleable
+        Exit processes in order to pickle the dataset.
         """
-        # Remove processes in order to pickle the dataset.
-        return {key: val for key, val in self.__dict__.items() if key not in self.EXCLUDED_KEYS}
-
-    def __setstate__(self, state):
-        """
-        Restores pickled state.
-
-        init_dataloader() must be called
-        after unpickling before using it with GAIL.
-
-        :param state: (dict)
-        """
-        self.__dict__.update(state)
-        for excluded_key in self.EXCLUDED_KEYS:
-            assert excluded_key not in state
-        self.dataloader = None
-        self.train_loader = None
-        self.val_loader = None
+        self.dataloader, self.train_loader, self.val_loader = None, None, None
 
     def log_info(self):
         """
@@ -205,7 +181,7 @@ class DataLoader(object):
     :param actions: (np.ndarray) actions
     :param batch_size: (int) Number of samples per minibatch
     :param n_workers: (int) number of preprocessing worker (for loading the images)
-    :param infinite_loop: (bool) whether to have an iterator that can be reset
+    :param infinite_loop: (bool) whether to have an iterator that can be resetted
     :param max_queue_len: (int) Max number of minibatches that can be preprocessed at the same time
     :param shuffle: (bool) Shuffle the minibatch after each epoch
     :param start_process: (bool) Start the preprocessing process (default: True)
@@ -228,7 +204,7 @@ class DataLoader(object):
         self.n_minibatches = len(indices) // batch_size
         # Add a partial minibatch, for instance
         # when there is not enough samples
-        if partial_minibatch and len(indices) % batch_size > 0:
+        if partial_minibatch and len(indices) / batch_size > 0:
             self.n_minibatches += 1
         self.batch_size = batch_size
         self.observations = observations

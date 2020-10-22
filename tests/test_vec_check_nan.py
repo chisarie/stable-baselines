@@ -68,4 +68,5 @@ def test_check_nan():
     else:
         assert False
 
+
     env.step(np.array([[0, 1], [0, 1]]))

@@ -43,11 +43,12 @@ Example
   import gym
 
   from stable_baselines.common.policies import MlpPolicy, MlpLstmPolicy, MlpLnLstmPolicy
-  from stable_baselines.common import make_vec_env
+  from stable_baselines.common.vec_env import SubprocVecEnv
   from stable_baselines import ACER
 
   # multiprocess environment
-  env = make_vec_env('CartPole-v1', n_envs=4)
+  n_cpu = 4
+  env = SubprocVecEnv([lambda: gym.make('CartPole-v1') for i in range(n_cpu)])
 
   model = ACER(MlpPolicy, env, verbose=1)
   model.learn(total_timesteps=25000)
@@ -70,49 +71,3 @@ Parameters
 .. autoclass:: ACER
   :members:
   :inherited-members:
-
-
-Callbacks - Accessible Variables 
---------------------------------
-
-Depending on initialization parameters and timestep, different variables are accessible.
-Variables accessible from "timestep X" are variables that can be accessed when
-``self.timestep==X`` from the ``on_step`` function.
-
-    +--------------------------------+-----------------------------------------------------+
-    |Variable                        |                                         Availability|
-    +================================+=====================================================+
-    |- self                          | From timestep 1                                     |
-    |- total_timesteps               |                                                     |
-    |- callback                      |                                                     |
-    |- log_interval                  |                                                     |
-    |- tb_log_name                   |                                                     |
-    |- reset_num_timesteps           |                                                     |
-    |- new_tb_log                    |                                                     |
-    |- writer                        |                                                     |
-    |- episode_stats                 |                                                     |
-    |- buffer                        |                                                     |
-    |- t_start                       |                                                     |
-    |- enc_obs                       |                                                     |
-    |- mb_obs                        |                                                     |
-    |- mb_actions                    |                                                     |
-    |- mb_mus                        |                                                     |
-    |- mb_dones                      |                                                     |
-    |- mb_rewards                    |                                                     |
-    |- actions                       |                                                     |
-    |- states                        |                                                     |
-    |- mus                           |                                                     |
-    |- clipped_actions               |                                                     |
-    |- obs                           |                                                     |
-    |- rewards                       |                                                     |
-    |- dones                         |                                                     |
-    +--------------------------------+-----------------------------------------------------+
-    |- steps                         | From timestep ``n_step+1``                          |
-    |- masks                         |                                                     |
-    +--------------------------------+-----------------------------------------------------+
-    |- names_ops                     | From timestep ``2 * n_step+1``                      |
-    |- values_ops                    |                                                     |
-    +--------------------------------+-----------------------------------------------------+
-    |- samples_number                | After replay_start steps,  when replay_ratio > 0 and|
-    |                                | buffer is not None                                  |
-    +--------------------------------+-----------------------------------------------------+

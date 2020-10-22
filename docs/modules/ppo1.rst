@@ -9,13 +9,13 @@ PPO1
 The `Proximal Policy Optimization <https://arxiv.org/abs/1707.06347>`_ algorithm combines ideas from A2C (having multiple workers)
 and TRPO (it uses a trust region to improve the actor).
 
-The main idea is that after an update, the new policy should be not too far from the ``old`` policy.
+The main idea is that after an update, the new policy should be not too far from the `old` policy.
 For that, ppo uses clipping to avoid too large update.
 
 .. note::
 
   PPO1 requires :ref:`OpenMPI <openmpi>`. If OpenMPI isn't enabled, then PPO1 isn't
-  imported into the ``stable_baselines`` module.
+  imported into the `stable_baselines` module.
 
 .. note::
 
@@ -59,9 +59,11 @@ Example
   import gym
 
   from stable_baselines.common.policies import MlpPolicy
+  from stable_baselines.common.vec_env import DummyVecEnv
   from stable_baselines import PPO1
 
   env = gym.make('CartPole-v1')
+  env = DummyVecEnv([lambda: env])
 
   model = PPO1(MlpPolicy, env, verbose=1)
   model.learn(total_timesteps=25000)
@@ -84,58 +86,3 @@ Parameters
 .. autoclass:: PPO1
   :members:
   :inherited-members:
-
-
-Callbacks - Accessible Variables
---------------------------------
-
-Depending on initialization parameters and timestep, different variables are accessible.
-Variables accessible "From timestep X" are variables that can be accessed when
-``self.timestep==X`` in the ``on_step`` function.
-
-    +--------------------------------+-----------------------------------------------------+
-    |Variable                        |                                         Availability|
-    +================================+=====================================================+
-    |- self                          |From timestep 0                                      |
-    |- total_timesteps               |                                                     |
-    |- callback                      |                                                     |
-    |- log_interval                  |                                                     |
-    |- tb_log_name                   |                                                     |
-    |- reset_num_timesteps           |                                                     |
-    |- new_tb_log                    |                                                     |
-    |- writer                        |                                                     |
-    |- policy                        |                                                     |
-    |- env                           |                                                     |
-    |- horizon                       |                                                     |
-    |- reward_giver                  |                                                     |
-    |- gail                          |                                                     |
-    |- step                          |                                                     |
-    |- cur_ep_ret                    |                                                     |
-    |- current_it_len                |                                                     |
-    |- current_ep_len                |                                                     |
-    |- cur_ep_true_ret               |                                                     |
-    |- ep_true_rets                  |                                                     |
-    |- ep_rets                       |                                                     |
-    |- ep_lens                       |                                                     |
-    |- observations                  |                                                     |
-    |- true_rewards                  |                                                     |
-    |- rewards                       |                                                     |
-    |- vpreds                        |                                                     |
-    |- episode_starts                |                                                     |
-    |- dones                         |                                                     |
-    |- actions                       |                                                     |
-    |- states                        |                                                     |
-    |- episode_start                 |                                                     |
-    |- done                          |                                                     |
-    |- vpred                         |                                                     |
-    |- _                             |                                                     |
-    |- i                             |                                                     |
-    |- clipped_action                |                                                     |
-    |- reward                        |                                                     |
-    |- true_reward                   |                                                     |
-    |- info                          |                                                     |
-    |- action                        |                                                     |
-    |- observation                   |                                                     |
-    +--------------------------------+-----------------------------------------------------+
-    |- maybe_ep_info                 |After the first episode termination                  |
-    +--------------------------------+-----------------------------------------------------+

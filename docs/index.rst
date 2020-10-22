@@ -18,10 +18,6 @@ RL Baselines zoo also offers a simple interface to train, evaluate agents and do
 You can read a detailed presentation of Stable Baselines in the
 Medium article: `link <https://medium.com/@araffin/stable-baselines-a-fork-of-openai-baselines-reinforcement-learning-made-easy-df87c4b2fc82>`_
 
-.. note::
-
-  Stable-Baselines3 (PyTorch edition) beta is now online: https://github.com/DLR-RM/stable-baselines3
-
 
 .. Example of internal link: :ref:`ppo2`
 
@@ -43,14 +39,12 @@ This toolset is a fork of OpenAI Baselines, with a major structural refactoring,
 
    guide/install
    guide/quickstart
-   guide/rl_tips
    guide/rl
    guide/algos
    guide/examples
    guide/vec_envs
    guide/custom_env
    guide/custom_policy
-   guide/callbacks
    guide/tensorboard
    guide/rl_zoo
    guide/pretrain
@@ -86,9 +80,6 @@ This toolset is a fork of OpenAI Baselines, with a major structural refactoring,
   common/tf_utils
   common/cmd_utils
   common/schedules
-  common/evaluation
-  common/env_checker
-  common/monitor
 
 .. toctree::
   :maxdepth: 1
@@ -117,8 +108,8 @@ To cite this project in publications:
 Contributing
 ------------
 
-To any interested in making the rl baselines better, there are still some improvements
-that need to be done.
+To any interested in making the rl baselines better, there is still some improvements
+that needs to be done.
 A full TODO list is available in the `roadmap <https://github.com/hill-a/stable-baselines/projects/1>`_.
 
 If you want to contribute, please read `CONTRIBUTING.md <https://github.com/hill-a/stable-baselines/blob/master/CONTRIBUTING.md>`_ first.

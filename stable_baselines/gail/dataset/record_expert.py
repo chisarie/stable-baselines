@@ -1,8 +1,7 @@
 import os
 import warnings
-from typing import Dict
 
-import cv2  # pytype:disable=import-error
+import cv2
 import numpy as np
 from gym import spaces
 
@@ -104,9 +103,9 @@ def generate_expert_traj(model, save_path=None, env=None, n_timesteps=0,
         mask = [True for _ in range(env.num_envs)]
 
     while ep_idx < n_episodes:
-        obs_ = obs[0] if is_vec_env else obs
         if record_images:
             image_path = os.path.join(image_folder, "{}.{}".format(idx, image_ext))
+            obs_ = obs[0] if is_vec_env else obs
             # Convert from RGB to BGR
             # which is the format OpenCV expect
             if obs_.shape[-1] == 3:
@@ -114,7 +113,7 @@ def generate_expert_traj(model, save_path=None, env=None, n_timesteps=0,
             cv2.imwrite(image_path, obs_)
             observations.append(image_path)
         else:
-            observations.append(obs_)
+            observations.append(obs)
 
         if isinstance(model, BaseRLModel):
             action, state = model.predict(obs, state=state, mask=mask)
@@ -168,7 +167,7 @@ def generate_expert_traj(model, save_path=None, env=None, n_timesteps=0,
         'rewards': rewards,
         'episode_returns': episode_returns,
         'episode_starts': episode_starts
-    }  # type: Dict[str, np.ndarray]
+    }
 
     for key, val in numpy_dict.items():
         print(key, val.shape)
